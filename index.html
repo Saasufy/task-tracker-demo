@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Task tracking app</title>
+    <link href="https://saasufy.com/node_modules/saasufy-components/styles.css" rel="stylesheet" />
+    <script src="https://saasufy.com/node_modules/saasufy-components/socket.js" type="module" defer></script>
+    <script src="https://saasufy.com/node_modules/saasufy-components/collection-adder.js" type="module" defer></script>
+    <script src="https://saasufy.com/node_modules/saasufy-components/collection-browser.js" type="module" defer></script>
+    <script src="https://saasufy.com/node_modules/saasufy-components/model-input.js" type="module" defer></script>
+    <script src="https://saasufy.com/node_modules/saasufy-components/input-provider.js" type="module" defer></script>
+  </head>
+  <body class="container-vertical container-centered-cross container-padded-large">
+    <socket-provider class="container-vertical container-narrow container-spaced-very-large" url="wss://saasufy.com/sid8002/socketcluster/">
+      <collection-adder
+        collection-type="Task"
+        collection-fields="title,desc:textarea,assignedTo,isCompleted:checkbox"
+        submit-button-label="Create task"
+        trim-spaces
+      ></collection-adder>
+
+      <input-provider
+        type="text"
+        consumers="collection-browser:collection-view-params"
+        provider-template="assignedTo={{value}}"
+        value=""
+        placeholder="User"
+      ></input-provider>
+
+      <collection-browser
+        collection-type="Task"
+        collection-fields="title,desc,assignedTo,isCompleted"
+        collection-view="assignedView"
+        collection-view-params="assignedTo="
+        collection-page-size="3"
+      >
+        <template slot="item">
+          <div>
+            <div>
+              <b>{{Task.title}}</b>
+            </div>
+            <model-input
+              type="textarea"
+              model-type="Task"
+              model-id="{{Task.id}}"
+              model-field="desc"
+              placeholder="Description"
+            ></model-input>
+            <div>{{Task.assignedTo}}</div>
+            <label class="label-container">
+              Is completed
+              <model-input
+                type="checkbox"
+                model-type="Task"
+                model-id="{{Task.id}}"
+                model-field="isCompleted"
+              ></model-input>
+            </label>
+          </div>
+        </template>
+
+        <template slot="loader">
+          <div class="loading-spinner-container">
+            <div class="spinning">&#8635;</div>
+          </div>
+        </template>
+
+        <div slot="viewport" class="container-vertical container-spaced-medium"></div>
+
+        <input slot="previous-page" type="button" value="Prev" />
+        <div slot="page-number"></div>
+        <input slot="next-page" type="button" value="Next" />
+
+      </collection-browser>
+    </socket-provider>
+  </body>
+</html>
